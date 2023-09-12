@@ -1,0 +1,31 @@
+name: Deploy .NET App to Nginx on Self-Hosted Runner
+
+on:
+  workflow_run:
+    workflows: [".NET Core 6 CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    # Download the build artifact
+    - name: Download build artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: app
+        path: out
+
+    # Deploy to the directory on your server where Nginx will serve the content
+    - name: Deploy to Nginx directory
+      run: |
+        cp -r ./out/* /path/to/nginx/directory/
+
+    # Reload Nginx to apply changes
+    - name: Reload Nginx
+      run: sudo nginx -s reload
