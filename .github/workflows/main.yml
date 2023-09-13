@@ -13,13 +13,25 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
+
+    # This step will list all available artifacts. This is to aid in debugging.
+    # Remove this once you have verified that everything works.
+    - name: List workflow runs
+      run: |
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        https://api.github.com/repos/${{ github.repository }}/actions/runs | jq ".workflow_runs[] | {id: .id, name: .name, artifacts_url: .artifacts_url}"
+
     # Download the build artifact
     - name: Download build artifact
       uses: actions/download-artifact@v2
       with:
         name: app
         path: out
+
+    # This step will print the contents of the 'out' directory.
+    # It's helpful for debugging. Remove this once everything is working correctly.
+    - name: List contents of downloaded artifact
+      run: ls -la out/
 
     # Deploy to the directory on your server where Nginx will serve the content
     - name: Deploy to Nginx directory
